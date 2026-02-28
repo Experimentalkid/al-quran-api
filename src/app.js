@@ -8,6 +8,7 @@ const surahRoutes = require('./routes/surah');
 const ayahRoutes = require('./routes/ayah');
 const translationRoutes = require('./routes/translation');
 const audioRoutes = require('./routes/audio');
+const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
@@ -26,6 +27,8 @@ app.use('/api/audio', audioRoutes);
 app.get('/', (req, res) => {
     res.json({ message: '📖 Al-Quran API is running!' });
 });
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
