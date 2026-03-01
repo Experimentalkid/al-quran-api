@@ -6,10 +6,18 @@ const cacheMiddleware = (req, res, next) => {
     const cached = cache.get(key);
 
     if (cached) {
-        return res.json({ source: 'cache', data: cached });
+        return res.json({ source: 'cache', ...cached });
     }
 
-    res.sendCachedResponse = (data) => cache.set(key, data);
+    // Intercept res.json to auto-cache the response
+    const originalJson = res.json.bind(res);
+    res.json = (body) => {
+        if (body?.success) {
+            cache.set(key, body);
+        }
+        return originalJson(body);
+    };
+
     next();
 };
 

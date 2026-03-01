@@ -1,4 +1,6 @@
 const errorHandler = (err, req, res, next) => {
+    console.error(`[ERROR] ${req.method} ${req.originalUrl} —`, err.message);
+
     if (err.response) {
         return res.status(err.response.status).json({
             success: false,

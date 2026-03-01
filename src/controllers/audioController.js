@@ -8,16 +8,20 @@ const RECITERS = {
     abdulbasit: 'ar.abdulbasit',
 };
 
-// GET available reciters
 exports.getReciters = (req, res) => {
     res.json({ success: true, reciters: Object.keys(RECITERS) });
 };
 
-// GET audio for a surah by reciter
 exports.getAudioSurah = async (req, res, next) => {
     try {
         const { number, reciter } = req.params;
-        const edition = RECITERS[reciter] || RECITERS['alafasy'];
+        const edition = RECITERS[reciter];
+        if (!edition) {
+            return res.status(400).json({
+                success: false,
+                message: `Reciter "${reciter}" not supported. Use /api/audio/reciters to see supported options.`,
+            });
+        }
         const { data } = await axios.get(`${BASE}/surah/${number}/${edition}`);
         const audioLinks = data.data.ayahs.map(a => ({
             ayah: a.numberInSurah,
@@ -25,4 +29,4 @@ exports.getAudioSurah = async (req, res, next) => {
         }));
         res.json({ success: true, reciter, surah: number, data: audioLinks });
     } catch (err) { next(err); }
-}; 
+};
